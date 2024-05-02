@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CLEWA LEVSN Partner Map</title>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+      .marker {
+        display: block;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        padding: 0;
+        top: 0;
+        position: absolute;
+        background-color: white;
+      }
+      .mapboxgl-popup {
+        max-width: 400px;
+        font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+        position: absolute;
+        top: 0;
+      }
+
+      .mapboxgl-popup-content {
+        color: aliceblue;
+        background-color: rgba(0, 0, 0, 0.7);
+        border-radius: 10px;
+        && > a {
+          color: aqua;
+        }
+      }
+
+      .mapboxgl-popup-tip {
+        border-top-color: rgba(0, 0, 0, 0.7) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+  </body>
+  <script>
+    mapboxgl.accessToken =
+      "pk.eyJ1IjoiYWxleHRhcmFzaXVrIiwiYSI6ImNsbDE4eWFpaTAxb2YzbG85cTg5M2I2aXIifQ.KCddQG3WthrZQIKIU-4gSg";
+    const map = new mapboxgl.Map({
+      container: "map",
+      // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+      style: "mapbox://styles/mapbox/navigation-night-v1",
+      zoom: 7.5,
+      center: [-81.3957751, 41.9767377],
+    });
+
+    map.on("load", async () => {
+      // const geojson = await getLocation();
+
+      //   map.addSource("clewa", {
+      //     type: "geojson",
+      //     data: geojson,
+      //   });
+
+      map.addLayer({
+        id: "clewa",
+        type: "circle",
+        source: "clewa",
+      });
+
+      const iconW = 70;
+      const iconH = 70;
+      // Add markers to the map.
+      async function addMarkers() {
+        const markers = [
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c7402801fe0946a9e1_ASHLAND%20SOIL%26WATER%20CONSERVATION%20DISTRICT-01.jpg",
+            },
+            geometry: {
+              coordinates: [-82.3184926, 40.8689536],
+            },
+            html: `<h2>
+                    Ashland Soil and Water Conservation District</h2>
+                    <a href="https://www.ashlandswcd.com/" target="_blank">
+                      Website</a>
+                    `,
+          },
+
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c6ce478b94acbb60e3_BGSU%20FIRELANDS-02.jpg",
+            },
+            geometry: {
+              coordinates: [-82.5945056, 41.3978458],
+            },
+            html: `<h2>BGSU Firelands</h2>
+                  <a href="https://www.bgsu.edu/firelands.html" target="_blank">
+                      Website</a>
+                  `,
+          },
+
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c7231536eee6704985_BUFFALO%20NIAGARA%20WATERKEEPER-03.jpg",
+            },
+            geometry: {
+              coordinates: [-78.8716186, 42.8935237],
+            },
+            html: `<h2>Buffalo Niagara Waterkeeper</h2>
+                  <a href="https://bnwaterkeeper.org/" target="_blank">
+                      Website</a>
+                  `,
+          },
+
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c78e45c7a82c22c55d_DEFIANCE-04.jpg",
+            },
+            geometry: {
+              coordinates: [-84.3662691, 41.2832597],
+            },
+            html: `<h2>City of Defiance</h2>
+                  <a href="https://cityofdefiance.com/" target="_blank">
+                      Website</a>
+                  `,
+          },
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c9a99fa73b51d1e239_CLINTON%20RIVER%20WATERSHED%20COUNCIL-06.jpg",
+            },
+            geometry: {
+              coordinates: [-83.1563685, 42.6653715],
+            },
+            html: `<h2>Clinton River Watershed Council</h2>
+                  <a href="https://www.crwc.org/" target="_blank">
+                      Website</a>
+                  `,
+          },
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c7dce1acc197271767_DEFIANCE%20COLLEGE-07.jpg",
+            },
+            geometry: {
+              coordinates: [-84.3602729, 41.2961012],
+            },
+            html: `<h2>Defiance College</h2>
+                  <a href="https://www.defiance.edu/" target="_blank">
+                      Website</a>
+                  `,
+          },
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c7ecc306917191f039_DEFIANCE%20SOIL%26WATER%20CONSERVATION%20DISTRICT-08.jpg",
+            },
+            geometry: {
+              coordinates: [-84.4163696, 41.3426546],
+            },
+            html: `<h2>Defiance Soil and Water Conservation District</h2>
+                  <a href="https://www.defianceswcd.org/" target="_blank">
+                      Website</a>
+                  `,
+          },
+
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c7d4cf24a46de07faa_DOAN%20BROOK%20WATERSHED%20PARTNERSHIP-09.jpg",
+            },
+            geometry: {
+              coordinates: [-81.5974433, 41.4919581],
+            },
+            html: `<h2>Doan Brook Watershed Partners</h2>
+                  <a href="https://doanbrookpartnership.org/" target="_blank">
+                      Website</a>
+                  `,
+          },
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c719582e0c54aefa13_ERIE%20CONSERVATION%20DISTRICT-10.jpg",
+            },
+            geometry: {
+              coordinates: [-82.6935671, 41.4272728],
+            },
+            html: `<h2>Erie Conservation District</h2>
+                  <a href="https://erieconserves.org/" target="_blank">
+                      Website</a>
+                  `,
+          },
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c61854049221c8ce11_HURON%20RIVER%20WATERSHED%20COUNCIL-12.jpg",
+            },
+            geometry: {
+              coordinates: [-83.7520432, 42.2823303],
+            },
+            html: `<h2>Huron River Watershed Council</h2>
+                  <a href="https://www.hrwc.org/" target="_blank">
+                      Website</a>
+                  `,
+          },
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c61854049221c8ce11_HURON%20RIVER%20WATERSHED%20COUNCIL-12.jpg",
+            },
+            geometry: {
+              coordinates: [-78.8803857, 42.9373291],
+            },
+            html: `<h2>McKinley Vocational High School</h2>
+                  <a href="https://www.buffaloschools.org/o/ps305" target="_blank">
+                      Website</a>
+                  `,
+          },
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c8a99fa73b51d1e20e_MCKINLEY%20HIGH%20SCHOOL-13.jpg",
+            },
+            geometry: {
+              coordinates: [-78.8803857, 42.9373291],
+            },
+            html: `<h2>McKinley Vocational High School</h2>
+                  <a href="https://www.buffaloschools.org/o/ps305" target="_blank">
+                      Website</a>
+                  `,
+          },
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://assets-global.website-files.com/637657aad5c230a847bf7380/63b3394d1c752e437b8ee4c8_Metroparks%20Toledo.webp",
+            },
+            geometry: {
+              coordinates: [-81.7189636, 41.4450481],
+            },
+            html: `<h2>Metroparks Toledo</h2>
+                  <a href="https://metroparkstoledo.com/" target="_blank">
+                      Website</a>
+                  `,
+          },
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c71a1f682f3329a2eb_NATIONAL%20ESTUARINE%20RESEARCH%20RESERVE%20OLD%20WOMAN%20CREEK-14.jpg",
+            },
+            geometry: {
+              coordinates: [-82.5094457, 41.3776922],
+            },
+            html: `<h2>Old Woman Creek National Estuarine Research Reserve</h2>
+                  `,
+          },
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c7a9856259bf4e409f_PARTNERS%20FOR%20CLEAN%20STREAMS-15.jpg",
+            },
+            geometry: {
+              coordinates: [-83.630918, 41.5583663],
+            },
+            html: `<h2>Partners for Clean Streams</h2>
+                  <a href="https://partnersforcleanstreams.org/" target="_blank">
+                      Website</a>
+                  `,
+          },
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c7a9856259bf4e409f_PARTNERS%20FOR%20CLEAN%20STREAMS-15.jpg",
+            },
+            geometry: {
+              coordinates: [-81.5306655, 41.0533178],
+            },
+            html: `<h2>Summit Soil and Water Conservation District</h2>
+    
+                  `,
+          },
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c7e6f548017a9abcc0_FREDONIA%20STATE%20UNIVERSITY%20OF%20NEW%20YORK-11.jpg",
+            },
+            geometry: {
+              coordinates: [-79.3586834, 42.4538479],
+            },
+            html: `<h2>SUNY Fredonia</h2>
+                  <a href="https://www.fredonia.edu/" target="_blank">
+                      Website</a>
+                  `,
+          },
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c723daf0d7ba22a839_TINKER%27S%20CREEK%20WATERSHED%20PARTNERS-17.jpg",
+            },
+            geometry: {
+              coordinates: [-81.4476645, 41.3179209],
+            },
+            html: `<h2>Tinker's Creek Watershed Partners</h2>
+                  <a href="https://tinkerscreek.org/" target="_blank">
+                      Website</a>
+                  `,
+          },
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c7821822aaa3d9be88_TMA%20COG-18.jpg",
+            },
+            geometry: {
+              coordinates: [-83.541862, 41.6383522],
+            },
+            html: `<h2>Toledo Metropolitan Area Council of Governments</h2>
+                  <a href="https://tmacog.org/" target="_blank">
+                      Website</a>
+                  `,
+          },
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c728c9b27219536dbf_TOLEDO%20ZOO%20%26%20AQUARIUM-19.jpg",
+            },
+            geometry: {
+              coordinates: [-83.5804111, 41.6178536],
+            },
+            html: `<h2>Toledo Zoo & Aquarium</h2>
+                  <a href="https://www.toledozoo.org/" target="_blank">
+                      Website</a>
+                  `,
+          },
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c820c59325e894ff6e_WATER%20RANGERS-20.jpg",
+            },
+            geometry: {
+              coordinates: [-81.8502942, 42.3177961],
+            },
+            html: `<h2>Water Rangers</h2>
+                  <a href="https://www.waterrangers.ca/projects/erie-guardians/" target="_blank">
+                      Website</a>
+                  `,
+          },
+        ];
+
+        for (const marker of markers) {
+          console.log(marker);
+          // Create a DOM element for each marker.
+          const el = document.createElement("div");
+          const width = marker.properties.iconSize[0];
+          const height = marker.properties.iconSize[1];
+          el.className = "marker";
+          el.style.backgroundImage = `url(${marker.properties.imageURL})`;
+          el.style.width = `${width}px`;
+          el.style.height = `${height}px`;
+          el.style.backgroundSize = "100%";
+          // el.addEventListener("click", () => {
+          //   showPopup;
+          // });
+          // Add markers to the map.
+          new mapboxgl.Marker(el)
+            .setLngLat(marker.geometry.coordinates)
+            .setPopup(
+              new mapboxgl.Popup({ offset: [0, -20] }).setHTML(marker.html)
+            ) // add popup
+            .addTo(map);
+        }
+      }
+      addMarkers();
+
+      map.on("click", (event) => {
+        const features = map.queryRenderedFeatures(event.point, {
+          layers: ["clewa"],
+        });
+        if (!features.length) {
+          return;
+        }
+        const feature = features[0];
+      });
+    });
+  </script>
+</html>
