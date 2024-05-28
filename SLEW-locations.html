@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CLEWA Smart Bouy Map</title>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+      .marker {
+        display: block;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        padding: 0;
+        top: 0;
+        position: absolute;
+      }
+      .mapboxgl-popup {
+        max-width: 400px;
+        font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+        position: absolute;
+        top: 0;
+        color: white;
+      }
+
+      .mapboxgl-popup a {
+        color: cadetblue;
+      }
+      .mapboxgl-popup-content {
+        background: rgba(0, 0, 0, 0.75);
+      }
+      .mapboxgl-popup-tip {
+        border-top-color: rgba(0, 0, 0, 0.75) !important;
+      }
+
+      .mapboxgl-marker {
+        border-width: 3px;
+        border-style: solid;
+      }
+
+      .fresh {
+        border-color: green;
+      }
+      .recent {
+        border-color: darkolivegreen;
+      }
+      .old {
+        border-color: orange;
+      }
+      .stale {
+        border-color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+  </body>
+  <script>
+    // UTIL
+    function celsiusToFahrenheit(celsius) {
+      // Check if the input is a valid number
+      if (typeof celsius !== "number") {
+        return "Input is not a valid number";
+      }
+      // Perform the conversion
+      const fahrenheit = (celsius * 9) / 5 + 32;
+      return fahrenheit.toFixed(1);
+    }
+
+    function metersPerSecondToKnots(mps) {
+      const knots = mps * 1.94384;
+      return knots.toFixed(2);
+    }
+
+    function formatRelativeDate(dateStr) {
+      const date = new Date(dateStr);
+
+      // Get the current date and time in Greenwich Mean Time (GMT)
+      var currentDate = new Date();
+      var gmtTimeString = currentDate.toLocaleString("en-US", {
+        timeZone: "UTC",
+      });
+
+      let localUpdateTime = date.toLocaleString("en-US", {
+        timeZone: "America/New_York",
+      });
+
+      // Convert the formatted string back to a Date object
+      var gmtTimeDateObject = new Date(gmtTimeString);
+
+      const delta = gmtTimeDateObject - date;
+
+      const seconds = Math.floor(delta / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+      const weeks = Math.floor(days / 7);
+      const months = Math.floor(days / 30);
+      const years = Math.floor(days / 365);
+      let dataStatus = {
+        message: "Unknown",
+        status: "",
+        localUpdateTime,
+      };
+
+      if (delta < 1000) {
+        return "Just now";
+      } else if (delta < 60000) {
+        dataStatus.message = `${seconds} second${seconds > 1 ? "s" : ""} ago`;
+        dataStatus.status = "fresh";
+      } else if (delta < 3600000) {
+        dataStatus.message = `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+        dataStatus.status = "fresh";
+      } else if (delta < 86400000) {
+        dataStatus.message = `${hours} hour${hours > 1 ? "s" : ""} ago`;
+        dataStatus.status = "recent";
+      } else if (delta < 604800000) {
+        dataStatus.message = `${days} days ago`;
+        dataStatus.status = "recent";
+      } else if (delta < 2592000000) {
+        dataStatus.message = `${weeks} week${weeks > 1 ? "s" : ""} ago`;
+        dataStatus.status = "old";
+        // } else if (delta < 31536000000) {
+        //   return `${months} months ago`;
+      } else {
+        //return `over ${years} year(s) ago`;
+        dataStatus.message = `Over a month ago`;
+        dataStatus.status = "stale";
+      }
+      return dataStatus;
+    }
+
+    mapboxgl.accessToken =
+      "pk.eyJ1IjoiYWxleHRhcmFzaXVrIiwiYSI6ImNsbDE4eWFpaTAxb2YzbG85cTg5M2I2aXIifQ.KCddQG3WthrZQIKIU-4gSg";
+    const map = new mapboxgl.Map({
+      container: "map",
+      // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+      style: "mapbox://styles/mapbox/streets-v12",
+      zoom: 8.5,
+      center: [-81.800004, 41.8411],
+    });
+
+    map.on("load", async () => {
+      // Get the initial location of the International Space Station (ISS).
+      const geojson = await getLocation();
+
+      map.addSource("clewa", {
+        type: "geojson",
+        data: geojson,
+      });
+
+      map.addLayer({
+        id: "clewa",
+        type: "circle",
+        source: "clewa",
+      });
+
+      // Update the source from the API every 10 seconds.
+      map.getSource("clewa").setData(geojson);
+
+      async function getLocation() {
+        // Make a GET request to the API and return the details of the bouys
+        try {
+          const response = await fetch(
+            //"http://localhost:3000/api/clewa",
+            "https://serverless-neon-mu.vercel.app/api/clewa",
+            { method: "GET" }
+          );
+          const { stations } = await response.json();
+          console.log(stations);
+          const latitude = stations[0].latitude;
+          const longitude = stations[0].longitude;
+          const airTemperature = 0;
+          const featuresArray = [];
+          stationInfoObject = stations.map((station) => {
+            stationFeatures = {
+              type: "Feature",
+              properties: {
+                name: station.samplingfeaturename,
+                type: station.extensionproperties.stationType,
+                imageURL: station.auxData.img_tall,
+                iconSize: [70, 70],
+                stationPage: station.stationPage,
+                lastUpdated: formatRelativeDate(station.lastUpdated),
+              },
+              geometry: {
+                type: "Point",
+                coordinates: [station.longitude, station.latitude],
+              },
+            };
+            station.results.map((result) => {
+              stationFeatures.properties[`${result.variableTerm}`] =
+                result?.values?.datavalue;
+            });
+            stationFeatures.html = `<h2>${stationFeatures.properties.name}</h2>`;
+            console.log(stationFeatures.properties.lastUpdated.message);
+            stationFeatures.html += `<p title="${stationFeatures.properties.lastUpdated.localUpdateTime}">Last Updated: ${stationFeatures.properties.lastUpdated.message}</p>`;
+            stationFeatures.html += stationFeatures.properties.wTemp
+              ? `<p>Water Temperature: ${celsiusToFahrenheit(
+                  stationFeatures.properties.wTemp
+                )}°F</p>`
+              : ``;
+
+            stationFeatures.html += stationFeatures.properties.rh
+              ? `<p>Relative Humidity: ${stationFeatures.properties.rh}%</p>`
+              : ``;
+
+            stationFeatures.html += stationFeatures.properties.wvhgt
+              ? `<p>Wave Height (meters): ${stationFeatures.properties.wvhgt}</p>`
+              : ``;
+
+            stationFeatures.html += stationFeatures.properties.ph
+              ? `<p>pH: ${stationFeatures.properties.ph}</p>`
+              : ``;
+
+            stationFeatures.html += stationFeatures.properties.spCond
+              ? `<p>Conductivity: ${stationFeatures.properties.spCond}</p>`
+              : ``;
+
+            stationFeatures.html += stationFeatures.properties.wspd
+              ? `<p>Wind Speed: ${metersPerSecondToKnots(
+                  stationFeatures.properties.wspd
+                )} Knots</p>`
+              : ``;
+
+            stationFeatures.html += `<p><a target="_blank" href="${stationFeatures.properties.stationPage}">Station Page</a></p>`;
+            featuresArray.push(stationFeatures);
+          });
+
+          return {
+            type: "FeatureCollection",
+            features: featuresArray,
+          };
+        } catch (err) {
+          // If the updateSource interval is defined, clear the interval to stop updating the source.
+
+          throw new Error(err);
+        }
+      }
+      // Add markers to the map.
+      async function addMarkers() {
+        for (const marker of geojson.features) {
+          // Create a DOM element for each marker.
+          const el = document.createElement("div");
+          const width = marker.properties.iconSize[0];
+          const height = marker.properties.iconSize[1];
+          el.className = "marker";
+          el.style.backgroundColor = "rgba(255,255,255,.75)";
+          el.style.backgroundImage = `${
+            marker.properties.type === "Buoy"
+              ? "url(https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/66565654cc482c56bcbd26f3_BUOY-01.svg)"
+              : "url(https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/66565650008621dd7680980c_BUOY-02.svg)"
+          }`;
+          el.classList.add(marker.properties.lastUpdated.status);
+          el.style.width = `${width}px`;
+          el.style.height = `${height}px`;
+          el.style.backgroundSize = "100%";
+          // el.addEventListener("click", () => {
+          //   showPopup;
+          // });
+          // Add markers to the map.
+          new mapboxgl.Marker(el)
+            .setLngLat(marker.geometry.coordinates)
+            .setPopup(
+              new mapboxgl.Popup({ offset: [0, -20] }).setHTML(marker.html)
+            ) // add popup
+            .addTo(map);
+        }
+      }
+      addMarkers();
+
+      map.on("click", (event) => {
+        const features = map.queryRenderedFeatures(event.point, {
+          layers: ["clewa"],
+        });
+        if (!features.length) {
+          return;
+        }
+        const feature = features[0];
+      });
+    });
+  </script>
+</html>
