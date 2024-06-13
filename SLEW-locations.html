@@ -69,12 +69,62 @@
       .stale {
         border-color: red;
       }
+
+      .filterWrapper {
+        position: relative;
+        z-index: 2;
+        margin: 10px 0 0 10px;
+      }
+      .filterBtn {
+        width: 30px;
+        height: 30px;
+        margin-bottom: 10px;
+        border-radius: 50%;
+      }
+
+      .staleFilter {
+        background-color: red;
+      }
+      .oldFilter {
+        background-color: orange;
+      }
+      .recentFilter {
+        background-color: darkolivegreen;
+      }
+      .freshFilter {
+        background-color: green;
+      }
+
+      .inactive {
+        opacity: 0.5;
+      }
     </style>
   </head>
   <body>
+    <div class="filterWrapper">
+      <div
+        class="filterBtn staleFilter"
+        onClick="toggleData(this, 'stale')"
+      ></div>
+      <div class="filterBtn oldFilter" onClick="toggleData(this, 'old')"></div>
+      <div
+        class="filterBtn recentFilter"
+        onClick="toggleData(this, 'recent')"
+      ></div>
+      <div
+        class="filterBtn freshFilter"
+        onClick="toggleData(this, 'fresh')"
+      ></div>
+    </div>
     <div id="map"></div>
   </body>
   <script>
+    const toggleData = (el, cat) => {
+      $(`.${cat}`).toggle();
+      console.log(el);
+      $(el).toggleClass("inactive");
+    };
+
     // UTIL
     function celsiusToFahrenheit(celsius) {
       // Check if the input is a valid number
