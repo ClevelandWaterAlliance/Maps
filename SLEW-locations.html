@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CLEWA Smart Bouy Map</title>
+    <title>CLEWA Smart Buoy Map</title>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
     <script
       src="https://code.jquery.com/jquery-3.7.1.min.js"
@@ -15,6 +15,13 @@
       rel="stylesheet"
     />
     <style>
+      :root {
+        --stale: rgb(255, 0, 0);
+        --old: rgb(255, 165, 0);
+        --recent: rgb(85, 107, 47);
+        --fresh: rgb(0, 128, 0);
+      }
+
       body {
         margin: 0;
         padding: 0;
@@ -58,16 +65,16 @@
       }
 
       .fresh {
-        border-color: green;
+        border-color: var(--fresh);
       }
       .recent {
-        border-color: darkolivegreen;
+        border-color: var(--recent);
       }
       .old {
-        border-color: orange;
+        border-color: var(--old);
       }
       .stale {
-        border-color: red;
+        border-color: var(--stale);
       }
 
       .filterWrapper {
@@ -83,16 +90,30 @@
       }
 
       .staleFilter {
-        background-color: red;
+        background-color: var(--stale);
+        border-color: var(--stale);
       }
       .oldFilter {
-        background-color: orange;
+        background-color: var(--old);
+        border-color: var(--old);
       }
       .recentFilter {
-        background-color: darkolivegreen;
+        background-color: var(--recent);
       }
       .freshFilter {
-        background-color: green;
+        background-color: var(--fresh);
+      }
+
+      .buoyFilter {
+        background-color: white;
+        background-image: url("https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/66565654cc482c56bcbd26f3_BUOY-01.svg");
+        background-size: contain;
+      }
+
+      .platformFilter {
+        background-color: white;
+        background-image: url("https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/66565650008621dd7680980c_BUOY-02.svg");
+        background-size: contain;
       }
 
       .inactive {
@@ -102,19 +123,34 @@
   </head>
   <body>
     <div class="filterWrapper">
-      <div
-        class="filterBtn staleFilter"
-        onClick="toggleData(this, 'stale')"
-      ></div>
-      <div class="filterBtn oldFilter" onClick="toggleData(this, 'old')"></div>
-      <div
-        class="filterBtn recentFilter"
-        onClick="toggleData(this, 'recent')"
-      ></div>
-      <div
-        class="filterBtn freshFilter"
-        onClick="toggleData(this, 'fresh')"
-      ></div>
+      <div class="flexcol">
+        <div
+          class="filterBtn staleFilter"
+          onClick="toggleData(this, 'stale')"
+        ></div>
+        <div
+          class="filterBtn oldFilter"
+          onClick="toggleData(this, 'old')"
+        ></div>
+        <div
+          class="filterBtn recentFilter"
+          onClick="toggleData(this, 'recent')"
+        ></div>
+        <div
+          class="filterBtn freshFilter"
+          onClick="toggleData(this, 'fresh')"
+        ></div>
+      </div>
+      <div class="flexrow">
+        <div
+          class="filterBtn buoyFilter"
+          onClick="toggleData(this, 'Buoy')"
+        ></div>
+        <div
+          class="filterBtn platformFilter"
+          onClick="toggleData(this, 'Platform')"
+        ></div>
+      </div>
     </div>
     <div id="map"></div>
   </body>
@@ -228,7 +264,7 @@
       map.getSource("clewa").setData(geojson);
 
       async function getLocation() {
-        // Make a GET request to the API and return the details of the bouys
+        // Make a GET request to the API and return the details of the buoys
         try {
           const response = await fetch(
             //"http://localhost:3000/api/clewa",
@@ -321,6 +357,7 @@
               : "url(https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/66565650008621dd7680980c_BUOY-02.svg)"
           }`;
           el.classList.add(marker.properties.lastUpdated.status);
+          el.classList.add(marker.properties.type);
           el.style.width = `${width}px`;
           el.style.height = `${height}px`;
           el.style.backgroundSize = "100%";
