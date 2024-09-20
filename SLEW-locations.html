@@ -270,8 +270,8 @@
         // Make a GET request to the API and return the details of the buoys
         try {
           const response = await fetch(
-            "http://localhost:3000/api/clewa",
-            //"https://serverless-neon-mu.vercel.app/api/clewa",
+            //"http://localhost:3000/api/clewa",
+            "https://serverless-neon-mu.vercel.app/api/clewa",
             { method: "GET" }
           );
           const { stations } = await response.json();
