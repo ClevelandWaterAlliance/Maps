@@ -15,6 +15,9 @@
       rel="stylesheet"
     />
     <style>
+      :root {
+        --marker-size: 50px;
+      }
       body {
         margin: 0;
         padding: 0;
@@ -33,6 +36,8 @@
         padding: 0;
         top: 0;
         position: absolute;
+        width: var(--marker-size) !important;
+        height: var(--marker-size) !important;
       }
       .mapboxgl-popup {
         width: 400px;
@@ -231,12 +236,11 @@
         // Make a GET request to the API and return the details of the bouys
         try {
           const response = await fetch(
-            //"http://localhost:3000/api/clewa",
-            "https://serverless-neon-mu.vercel.app/api/clewa",
+            "http://localhost:3000/api/clewa",
+            //"https://serverless-neon-mu.vercel.app/api/clewa",
             { method: "GET" }
           );
           const { stations } = await response.json();
-          console.log(stations);
           const latitude = stations[0].latitude;
           const longitude = stations[0].longitude;
           const airTemperature = 0;
@@ -248,7 +252,7 @@
                 name: station.samplingfeaturename,
                 type: station.extensionproperties.stationType,
                 imageURL: station.auxData.img_tall,
-                iconSize: [70, 70],
+                iconSize: ["interpolate", ["linear"], ["zoom"], 10, 1, 15, 0.5],
                 stationPage: station.stationPage,
                 lastUpdated: formatRelativeDate(station.lastUpdated),
               },
@@ -337,6 +341,16 @@
         }
       }
       addMarkers();
+
+      map.on("render", function () {
+        const scale = Math.pow(2, map.getZoom());
+        console.log(scale);
+        let root = document.documentElement;
+        root.style.setProperty(
+          "--marker-size",
+          `clamp(30px, ${scale / 10}px, 5vw)`
+        );
+      });
 
       map.on("click", (event) => {
         const features = map.queryRenderedFeatures(event.point, {
