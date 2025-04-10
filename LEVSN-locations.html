@@ -15,6 +15,9 @@
       rel="stylesheet"
     />
     <style>
+      :root {
+        --marker-size: 50px;
+      }
       body {
         margin: 0;
         padding: 0;
@@ -33,7 +36,8 @@
         padding: 0;
         top: 0;
         position: absolute;
-        background-color: white;
+        width: var(--marker-size) !important;
+        height: var(--marker-size) !important;
       }
       .mapboxgl-popup {
         max-width: 400px;
@@ -96,7 +100,7 @@
                 "https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/6633c4c7402801fe0946a9e1_ASHLAND%20SOIL%26WATER%20CONSERVATION%20DISTRICT-01.jpg",
             },
             geometry: {
-              coordinates: [-82.3184926, 40.8689536],
+              coordinates: [-82.3183307, 40.8690567],
             },
             html: `<h2>
                     Ashland Soil and Water Conservation District</h2>
@@ -385,6 +389,20 @@
                       Website</a>
                   `,
           },
+          {
+            properties: {
+              iconSize: [iconW, iconH],
+              imageURL:
+                "https://cdn.prod.website-files.com/637657aad5c230a847bf7380/67f82dab86b5cfc68b330eab_RAEON.webp",
+            },
+            geometry: {
+              coordinates: [-83.0735232, 42.3077778],
+            },
+            html: `<h2>University of Windsor Real-Time Aquatic Ecosystem Observation Network (Ontario)</h2>
+                  <a href="https://raeon.org/" target="_blank">
+                      Website</a>
+                  `,
+          },
         ];
 
         for (const marker of markers) {
@@ -411,6 +429,16 @@
         }
       }
       addMarkers();
+
+      map.on("render", function () {
+        const scale = Math.pow(2, map.getZoom());
+        console.log(scale);
+        let root = document.documentElement;
+        root.style.setProperty(
+          "--marker-size",
+          `clamp(30px, ${scale / 10}px, 5vw)`
+        );
+      });
 
       map.on("click", (event) => {
         const features = map.queryRenderedFeatures(event.point, {
