@@ -297,15 +297,22 @@
               stationFeatures.properties[`${result.variableTerm}`] =
                 result?.values?.datavalue;
             });
+            console.log(
+              `STATIONFeatureProperties FOR ${stationFeatures.properties.name}=> `,
+              stationFeatures.properties
+            );
             stationFeatures.html = `<div style="height: 200px; width:100%; background-size: cover; background-position: center center;background-image: url(${stationFeatures.properties.imageURL})"></div>`;
             stationFeatures.html += `<h2>${stationFeatures.properties.name}</h2>`;
             console.log(stationFeatures.properties.lastUpdated.message);
             stationFeatures.html += `<p title="${stationFeatures.properties.lastUpdated.localUpdateTime}">Last Updated: ${stationFeatures.properties.lastUpdated.message}</p>`;
-            stationFeatures.html += stationFeatures.properties.wTemp
-              ? `<p>Water Temperature: ${celsiusToFahrenheit(
-                  stationFeatures.properties.wTemp
-                )}°F</p>`
-              : ``;
+            stationFeatures.html +=
+              stationFeatures.properties.wTemp !== null &&
+              stationFeatures.properties.wTemp !== undefined &&
+              stationFeatures.properties.wTemp > -99
+                ? `<p>Water Temperature: ${celsiusToFahrenheit(
+                    stationFeatures.properties.wTemp
+                  )}°F</p>`
+                : ``;
 
             stationFeatures.html += stationFeatures.properties.rh
               ? `<p>Relative Humidity: ${stationFeatures.properties.rh}%</p>`
@@ -315,13 +322,13 @@
               ? `<p>Wave Height (meters): ${stationFeatures.properties.wvhgt}</p>`
               : ``;
 
-            stationFeatures.html += stationFeatures.properties.ph
-              ? `<p>pH: ${stationFeatures.properties.ph}</p>`
-              : ``;
+            // stationFeatures.html += stationFeatures.properties.ph
+            //   ? `<p>pH: ${stationFeatures.properties.ph}</p>`
+            //   : ``;
 
-            stationFeatures.html += stationFeatures.properties.spCond
-              ? `<p>Conductivity: ${stationFeatures.properties.spCond}</p>`
-              : ``;
+            // stationFeatures.html += stationFeatures.properties.spCond
+            //   ? `<p>Conductivity: ${stationFeatures.properties.spCond}</p>`
+            //   : ``;
 
             stationFeatures.html += stationFeatures.properties.wspd
               ? `<p>Wind Speed: ${metersPerSecondToKnots(
