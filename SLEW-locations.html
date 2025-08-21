@@ -303,15 +303,15 @@
             );
             stationFeatures.html = `<div style="height: 200px; width:100%; background-size: cover; background-position: center center;background-image: url(${stationFeatures.properties.imageURL})"></div>`;
             stationFeatures.html += `<h2>${stationFeatures.properties.name}</h2>`;
-            console.log(stationFeatures.properties.lastUpdated.message);
+            console.log(stationFeatures.properties);
             stationFeatures.html += `<p title="${stationFeatures.properties.lastUpdated.localUpdateTime}">Last Updated: ${stationFeatures.properties.lastUpdated.message}</p>`;
             stationFeatures.html +=
               stationFeatures.properties.wTemp !== null &&
               stationFeatures.properties.wTemp !== undefined &&
               stationFeatures.properties.wTemp > -99
-                ? `<p>Water Temperature: ${celsiusToFahrenheit(
-                    stationFeatures.properties.wTemp.toFixed(2)
-                  )}°F</p>`
+                ? `<p>Water Temperature: ${parseInt(
+                    celsiusToFahrenheit(stationFeatures.properties.wTemp)
+                  ).toFixed(2)}°F</p>`
                 : ``;
 
             stationFeatures.html +=
@@ -337,11 +337,14 @@
             //   ? `<p>Conductivity: ${stationFeatures.properties.spCond}</p>`
             //   : ``;
 
-            stationFeatures.html += stationFeatures.properties.wspd
-              ? `<p>Wind Speed: ${metersPerSecondToKnots(
-                  stationFeatures.properties.wspd.toFixed(2)
-                )} Knots</p>`
-              : ``;
+            stationFeatures.html +=
+              stationFeatures.properties.wspd !== null &&
+              stationFeatures.properties.wspd !== undefined &&
+              stationFeatures.properties.wspd > -99
+                ? `<p>Wind Speed: ${parseInt(
+                    metersPerSecondToKnots(stationFeatures.properties.wspd)
+                  )} Knots</p>`
+                : ``;
 
             featuresArray.push(stationFeatures);
           });
