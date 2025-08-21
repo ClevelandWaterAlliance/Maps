@@ -310,16 +310,23 @@
               stationFeatures.properties.wTemp !== undefined &&
               stationFeatures.properties.wTemp > -99
                 ? `<p>Water Temperature: ${celsiusToFahrenheit(
-                    stationFeatures.properties.wTemp
+                    stationFeatures.properties.wTemp.toFixed(2)
                   )}°F</p>`
                 : ``;
 
-            stationFeatures.html += stationFeatures.properties.rh
-              ? `<p>Relative Humidity: ${stationFeatures.properties.rh}%</p>`
-              : ``;
+            stationFeatures.html +=
+              stationFeatures.properties.rh !== null &&
+              stationFeatures.properties.rh !== undefined &&
+              stationFeatures.properties.rh > -99
+                ? `<p>Relative Humidity: ${stationFeatures.properties.rh.toFixed(
+                    2
+                  )}%</p>`
+                : ``;
 
             stationFeatures.html += stationFeatures.properties.wvhgt
-              ? `<p>Wave Height (meters): ${stationFeatures.properties.wvhgt}</p>`
+              ? `<p>Wave Height (meters): ${stationFeatures.properties.wvhgt.toFixed(
+                  2
+                )}</p>`
               : ``;
 
             // stationFeatures.html += stationFeatures.properties.ph
@@ -332,7 +339,7 @@
 
             stationFeatures.html += stationFeatures.properties.wspd
               ? `<p>Wind Speed: ${metersPerSecondToKnots(
-                  stationFeatures.properties.wspd
+                  stationFeatures.properties.wspd.toFixed(2)
                 )} Knots</p>`
               : ``;
 
