@@ -1,349 +1,759 @@
-[
-  {
-    "terms": [
-      "Water temperature",
-      "Water temperature (0 m)",
-      "wtemp",
-      "wTemp",
-      "Wtemp 1",
-      "Wtemp 1.5",
-      "Wtemp 1m",
-      "Wtemp 2",
-      "Wtemp 2m",
-      "Wtemp 3",
-      "Wtemp 4",
-      "Wtemp 4.5",
-      "Wtemp 4.6",
-      "Wtemp 4m",
-      "Wtemp 5",
-      "Wtemp 6",
-      "Wtemp 6m",
-      "Wtemp 7.5",
-      "Wtemp 7.6",
-      "Wtemp 8",
-      "Wtemp 8m",
-      "Wtemp 9",
-      "Wtemp 9.1",
-      "Wtemp 10.5",
-      "Wtemp 10.7",
-      "Wtemp 10m",
-      "Wtemp 11.3",
-      "Wtemp 11.8",
-      "Wtemp 12",
-      "Wtemp 12.5",
-      "Wtemp 12m",
-      "Wtemp 13.1",
-      "Wtemp 13.5",
-      "Wtemp 13.7",
-      "Wtemp 13.8",
-      "Wtemp 14.3",
-      "Wtemp 14.9",
-      "Wtemp 14m",
-      "Wtemp 15",
-      "Wtemp 15.3",
-      "Wtemp 16m",
-      "Wtemp 18m",
-      "Wtemp 20m",
-      "Wtemp 21m"
+{
+  "_comment": "Generated from GLSC_CwaData.xlsx (Sheets: Stations, Parameter Names). Rebuild: python scripts/build_popup_from_glsc_xlsx.py",
+  "parameterDefinitions": [
+    {
+      "id": "encrh",
+      "terms": [
+        "Encrh"
+      ],
+      "label": "Enclosure RH",
+      "format": "percent",
+      "decimals": 1
+    },
+    {
+      "id": "enctemp",
+      "terms": [
+        "Enctemp"
+      ],
+      "label": "Enclosure Temp",
+      "format": "celsiusF",
+      "hideIfLe": -99
+    },
+    {
+      "id": "airtemp",
+      "terms": [
+        "Air temperature",
+        "airtemp"
+      ],
+      "label": "Air Temperature",
+      "format": "celsiusF",
+      "hideIfLe": -99
+    },
+    {
+      "id": "dewpt",
+      "terms": [
+        "Dew point",
+        "dewpt"
+      ],
+      "label": "Dewpoint Temp",
+      "format": "celsiusF",
+      "hideIfLe": -99
+    },
+    {
+      "id": "rh",
+      "terms": [
+        "Relative humidity",
+        "rh"
+      ],
+      "label": "Relative Humidity",
+      "format": "percent",
+      "decimals": 1
+    },
+    {
+      "id": "heatindex",
+      "terms": [
+        "Heat index",
+        "heatIndex"
+      ],
+      "label": "Heat Index",
+      "format": "number",
+      "decimals": 2
+    },
+    {
+      "id": "baro",
+      "terms": [
+        "Barometric pressure",
+        "baro"
+      ],
+      "label": "Air Presure W.R.T. Sea Level",
+      "format": "number",
+      "decimals": 2
+    },
+    {
+      "id": "sbar",
+      "terms": [
+        "Sbar"
+      ],
+      "label": "Relative Station Pressure",
+      "format": "number",
+      "decimals": 2
+    },
+    {
+      "id": "wspd",
+      "terms": [
+        "Wind speed",
+        "wspd"
+      ],
+      "label": "Wind Speed",
+      "format": "knotsFromMps",
+      "hideIfLe": -99
+    },
+    {
+      "id": "wdir",
+      "terms": [
+        "Wind direction",
+        "wdir"
+      ],
+      "label": "Wind Direction",
+      "format": "degrees",
+      "hideIfLe": -99
+    },
+    {
+      "id": "wdirraw",
+      "terms": [
+        "Wdirraw",
+        "Wdirraw2"
+      ],
+      "label": "Uncorrected Wind Direction",
+      "format": "degrees",
+      "hideIfLe": -99
+    },
+    {
+      "id": "precipaccum",
+      "terms": [
+        "Precipitation accumulation",
+        "precipAccum"
+      ],
+      "label": "Precipitaiton Accumulation",
+      "format": "number",
+      "decimals": 2
+    },
+    {
+      "id": "precipint",
+      "terms": [
+        "Precipint"
+      ],
+      "label": "Precipitaiton Intensity",
+      "format": "number",
+      "decimals": 2
+    },
+    {
+      "id": "srad",
+      "terms": [
+        "Solar radiation",
+        "srad"
+      ],
+      "label": "Solar Shortwave Radiation",
+      "format": "integer"
+    },
+    {
+      "id": "par",
+      "terms": [
+        "Par"
+      ],
+      "label": "Photosynthetic Active Radiation",
+      "format": "number",
+      "decimals": 2
+    },
+    {
+      "id": "radmv",
+      "terms": [
+        "Radmv"
+      ],
+      "label": "srad or par raw voltage",
+      "format": "number",
+      "decimals": 2
+    },
+    {
+      "id": "soilea",
+      "terms": [
+        "SoilEa"
+      ],
+      "label": "Soil conductivity",
+      "format": "number",
+      "decimals": 2
+    },
+    {
+      "id": "wvhgt",
+      "terms": [
+        "Wave height",
+        "wvhgt"
+      ],
+      "label": "Wave Height",
+      "format": "meters",
+      "decimals": 2
+    },
+    {
+      "id": "h10wvhgt",
+      "terms": [
+        "H10wvhgt"
+      ],
+      "label": "10th Percentile of Wave Height",
+      "format": "meters",
+      "decimals": 2
+    },
+    {
+      "id": "maxwvhgt",
+      "terms": [
+        "Maxwvhgt"
+      ],
+      "label": "Maximum Wave Height",
+      "format": "meters",
+      "decimals": 2
+    },
+    {
+      "id": "dompd",
+      "terms": [
+        "Dominant period",
+        "dompd"
+      ],
+      "label": "Wave period",
+      "format": "seconds",
+      "decimals": 0
+    },
+    {
+      "id": "maxpd",
+      "terms": [
+        "Maxpd"
+      ],
+      "label": "Maximum Wave Period",
+      "format": "seconds",
+      "decimals": 0
+    },
+    {
+      "id": "spcond",
+      "terms": [
+        "Spcond",
+        "Spcond 6",
+        "Spcond 8"
+      ],
+      "label": "Specific Conductance",
+      "format": "number",
+      "decimals": 2
+    },
+    {
+      "id": "turb",
+      "terms": [
+        "Turb",
+        "Turb 6",
+        "Turb 8"
+      ],
+      "label": "Turbidity",
+      "format": "number",
+      "decimals": 2
+    },
+    {
+      "id": "ph",
+      "terms": [
+        "Ph",
+        "Ph 6",
+        "Ph 8",
+        "Ph 15"
+      ],
+      "label": "pH",
+      "format": "number",
+      "decimals": 2
+    },
+    {
+      "id": "orp",
+      "terms": [
+        "Orp",
+        "Orp 6",
+        "Orp 8"
+      ],
+      "label": "Oxidation Reduction Potential",
+      "format": "number",
+      "decimals": 2
+    },
+    {
+      "id": "chlrfu",
+      "terms": [
+        "Chlrfu",
+        "Chlrfu 13.8",
+        "Chlrfu 15"
+      ],
+      "label": "Chyrlophyll",
+      "format": "number",
+      "decimals": 2
+    },
+    {
+      "id": "bgarfu",
+      "terms": [
+        "Bgarfu",
+        "Bgacells"
+      ],
+      "label": "Blue-Green Algae",
+      "format": "number",
+      "decimals": 2
+    },
+    {
+      "id": "do",
+      "terms": [
+        "Do",
+        "Do 6",
+        "Do 8",
+        "Do 15",
+        "Do 21m"
+      ],
+      "label": "Dissolve oxygen",
+      "format": "number",
+      "decimals": 2
+    },
+    {
+      "id": "dosat",
+      "terms": [
+        "Dosat",
+        "Dosat 6",
+        "Dosat 8"
+      ],
+      "label": "DO at saturation",
+      "format": "percent",
+      "decimals": 1
+    },
+    {
+      "id": "wligld",
+      "terms": [
+        "Water Level (ft) at IGLD85 - Sensor #1",
+        "Water level",
+        "wligld"
+      ],
+      "label": "Water level at IGLD",
+      "format": "number",
+      "decimals": 2
+    },
+    {
+      "id": "wgst",
+      "terms": [
+        "Wind gust",
+        "wgst"
+      ],
+      "label": "Wind gust",
+      "format": "knotsFromMps",
+      "hideIfLe": -99
+    },
+    {
+      "id": "wtemp",
+      "terms": [
+        "Water temperature",
+        "Water temperature (0 m)",
+        "wtemp",
+        "Wtemp 1",
+        "Wtemp 1m",
+        "Wtemp 2",
+        "Wtemp 2m",
+        "Wtemp 6",
+        "Wtemp 8",
+        "Wtemp 10m",
+        "Wtemp 12m",
+        "Wtemp 15",
+        "Wtemp 21m"
+      ],
+      "label": "Water temperature",
+      "format": "celsiusF",
+      "hideIfLe": -99
+    },
+    {
+      "id": "wtemp_0m",
+      "terms": [
+        "Water temperature",
+        "wtemp",
+        "Water temperature (0 m)",
+        "Wtemp 1m",
+        "Wtemp 1",
+        "Wtemp 2m"
+      ],
+      "label": "Water temperature (0 m)",
+      "format": "celsiusF",
+      "hideIfLe": -99
+    },
+    {
+      "id": "soilvwc-075",
+      "terms": [
+        "Soilvwc 0.075m"
+      ],
+      "label": "Soil VWC (0.075 m)",
+      "format": "number",
+      "decimals": 1
+    },
+    {
+      "id": "soilvwc-225",
+      "terms": [
+        "Soilvwc 0.225m"
+      ],
+      "label": "Soil VWC (0.225 m)",
+      "format": "number",
+      "decimals": 1
+    },
+    {
+      "id": "soilvwc-375",
+      "terms": [
+        "Soilvwc 0.375m"
+      ],
+      "label": "Soil VWC (0.375 m)",
+      "format": "number",
+      "decimals": 1
+    },
+    {
+      "id": "soiltemp-035",
+      "terms": [
+        "Soiltemp 0.035m"
+      ],
+      "label": "Soil temperature (0.035 m)",
+      "format": "celsiusF",
+      "hideIfLe": -99
+    },
+    {
+      "id": "soiltemp-1",
+      "terms": [
+        "Soiltemp 0.1m"
+      ],
+      "label": "Soil temperature (0.1 m)",
+      "format": "celsiusF",
+      "hideIfLe": -99
+    },
+    {
+      "id": "soiltemp-2",
+      "terms": [
+        "Soiltemp 0.2m"
+      ],
+      "label": "Soil temperature (0.2 m)",
+      "format": "celsiusF",
+      "hideIfLe": -99
+    }
+  ],
+  "stationParameterOrder": {
+    "GLSC Stormwater 11": [
+      "soilvwc-075",
+      "soilvwc-225",
+      "soilvwc-375",
+      "soiltemp-035",
+      "soiltemp-1",
+      "soiltemp-2",
+      "airtemp",
+      "precipaccum",
+      "srad"
     ],
-    "label": "Water temperature",
-    "format": "celsiusF",
-    "hideIfLe": -99
-  },
-  {
-    "terms": ["Water Temperature (F) - Sensor #1"],
-    "label": "Water temperature (sensor °F)",
-    "format": "fahrenheit",
-    "hideIfLe": -99,
-    "decimals": 1
-  },
-  {
-    "terms": ["Air temperature", "airtemp"],
-    "label": "Air temperature",
-    "format": "celsiusF",
-    "hideIfLe": -99
-  },
-  {
-    "terms": ["Dew point"],
-    "label": "Dew point",
-    "format": "celsiusF",
-    "hideIfLe": -99
-  },
-  {
-    "terms": ["Relative humidity", "rh"],
-    "label": "Relative humidity",
-    "format": "percent",
-    "hideIfLe": -99,
-    "decimals": 1
-  },
-  {
-    "terms": ["Encrh"],
-    "label": "Enclosure RH",
-    "format": "percent",
-    "hideIfLe": -99,
-    "decimals": 1
-  },
-  {
-    "terms": ["Barometric pressure"],
-    "label": "Barometric pressure",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Wind speed", "wspd"],
-    "label": "Wind speed",
-    "format": "knotsFromMps",
-    "hideIfLe": -99
-  },
-  {
-    "terms": ["Wind gust"],
-    "label": "Wind gust",
-    "format": "knotsFromMps",
-    "hideIfLe": -99
-  },
-  {
-    "terms": ["Wind direction"],
-    "label": "Wind direction",
-    "format": "degrees",
-    "hideIfLe": -99
-  },
-  {
-    "terms": ["Wave height", "wvhgt"],
-    "label": "Wave height",
-    "format": "meters",
-    "decimals": 2
-  },
-  {
-    "terms": ["Dominant period"],
-    "label": "Dominant wave period",
-    "format": "seconds",
-    "decimals": 0
-  },
-  {
-    "terms": ["Water level"],
-    "label": "Water level",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Water Level (ft) at IGLD85 - Sensor #1"],
-    "label": "Water level (ft, IGLD85)",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Distance to Water (ft) - Sensor #1"],
-    "label": "Distance to water (ft)",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Depth"],
-    "label": "Depth",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Solar radiation", "srad"],
-    "label": "Solar radiation",
-    "format": "integer"
-  },
-  {
-    "terms": ["Par"],
-    "label": "PAR",
-    "format": "number",
-    "decimals": 1
-  },
-  {
-    "terms": ["Ph 6"],
-    "label": "pH (6 m)",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Ph 8"],
-    "label": "pH (8 m)",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Ph 13.8"],
-    "label": "pH (13.8 m)",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Ph 15"],
-    "label": "pH (15 m)",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Ph 21m"],
-    "label": "pH (21 m)",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Do 6"],
-    "label": "Dissolved oxygen (6 m)",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Do 8"],
-    "label": "Dissolved oxygen (8 m)",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Do 15"],
-    "label": "Dissolved oxygen (15 m)",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Do 21m"],
-    "label": "Dissolved oxygen (21 m)",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Dosat 6"],
-    "label": "DO saturation (6 m)",
-    "format": "percent",
-    "decimals": 1
-  },
-  {
-    "terms": ["Dosat 8"],
-    "label": "DO saturation (8 m)",
-    "format": "percent",
-    "decimals": 1
-  },
-  {
-    "terms": ["Turb 6"],
-    "label": "Turbidity (6 m)",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Turb 8"],
-    "label": "Turbidity (8 m)",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Spcond 6"],
-    "label": "Specific conductance (6 m)",
-    "format": "number",
-    "decimals": 1
-  },
-  {
-    "terms": ["Spcond 8"],
-    "label": "Specific conductance (8 m)",
-    "format": "number",
-    "decimals": 1
-  },
-  {
-    "terms": ["Sal"],
-    "label": "Salinity",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Orp 6"],
-    "label": "ORP (6 m)",
-    "format": "number",
-    "decimals": 1
-  },
-  {
-    "terms": ["Orp 8"],
-    "label": "ORP (8 m)",
-    "format": "number",
-    "decimals": 1
-  },
-  {
-    "terms": ["Fdomrfu"],
-    "label": "fDOM (RFU)",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Chlrfu 13.8"],
-    "label": "Chlorophyll (RFU, 13.8 m)",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Chlrfu 15"],
-    "label": "Chlorophyll (RFU, 15 m)",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Bgacells"],
-    "label": "BGA cells",
-    "format": "number",
-    "decimals": 0
-  },
-  {
-    "terms": ["Soilvwc 0.075m"],
-    "label": "Soil VWC (0.075 m)",
-    "format": "number",
-    "decimals": 1
-  },
-  {
-    "terms": ["Soilvwc 0.225m"],
-    "label": "Soil VWC (0.225 m)",
-    "format": "number",
-    "decimals": 1
-  },
-  {
-    "terms": ["Soilvwc 0.375m"],
-    "label": "Soil VWC (0.375 m)",
-    "format": "number",
-    "decimals": 1
-  },
-  {
-    "terms": ["Soiltemp 0.035m"],
-    "label": "Soil temp (0.035 m)",
-    "format": "celsiusF",
-    "hideIfLe": -99
-  },
-  {
-    "terms": ["Soiltemp 0.1m"],
-    "label": "Soil temp (0.1 m)",
-    "format": "celsiusF",
-    "hideIfLe": -99
-  },
-  {
-    "terms": ["Soiltemp 0.2m"],
-    "label": "Soil temp (0.2 m)",
-    "format": "celsiusF",
-    "hideIfLe": -99
-  },
-  {
-    "terms": ["Precipitation accumulation"],
-    "label": "Precipitation accumulation",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Precipint"],
-    "label": "Precipitation intensity",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Vbat"],
-    "label": "Battery (V)",
-    "format": "number",
-    "decimals": 2
-  },
-  {
-    "terms": ["Enctemp"],
-    "label": "Enclosure temperature",
-    "format": "celsiusF",
-    "hideIfLe": -99
+    "864622040818805": [
+      "soilvwc-075",
+      "soilvwc-225",
+      "soilvwc-375",
+      "soiltemp-035",
+      "soiltemp-1",
+      "soiltemp-2",
+      "airtemp",
+      "precipaccum",
+      "srad"
+    ],
+    "mcglsc": [
+      "wtemp_0m",
+      "wligld"
+    ],
+    "mcond3kit7": [
+      "wtemp_0m",
+      "wligld"
+    ],
+    "Mwglsc": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "MarineWx3": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "Mwthl": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "MarineWx1": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "Mwepp": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "MarineWx4": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "Mwgib": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "MarineWx6": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "Mwturk": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "MarineWx7": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "mwcatawba": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "MarineWx10": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "Mwchargrin": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "359746163562080": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "Mwewp": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "359746163529402": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "Mwavon": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "351516174975466": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ],
+    "45164": [
+      "wspd",
+      "wdir",
+      "airtemp",
+      "wtemp",
+      "wvhgt",
+      "dompd"
+    ],
+    "45176": [
+      "wspd",
+      "wdir",
+      "airtemp",
+      "wtemp",
+      "wvhgt",
+      "dompd"
+    ],
+    "45196": [
+      "wspd",
+      "wdir",
+      "airtemp",
+      "wtemp",
+      "wvhgt",
+      "dompd"
+    ],
+    "45197": [
+      "wspd",
+      "wdir",
+      "airtemp",
+      "wtemp",
+      "wvhgt",
+      "dompd"
+    ],
+    "45200": [
+      "wspd",
+      "wdir",
+      "airtemp",
+      "wtemp",
+      "wvhgt",
+      "dompd"
+    ],
+    "45201": [
+      "wspd",
+      "wdir",
+      "airtemp",
+      "wtemp",
+      "wvhgt",
+      "dompd"
+    ],
+    "45202": [
+      "wspd",
+      "wdir",
+      "airtemp",
+      "wtemp",
+      "wvhgt",
+      "dompd"
+    ],
+    "45203": [
+      "wspd",
+      "wdir",
+      "airtemp",
+      "wtemp",
+      "wvhgt",
+      "dompd"
+    ],
+    "45204": [
+      "wspd",
+      "wdir",
+      "airtemp",
+      "wtemp",
+      "wvhgt",
+      "dompd"
+    ],
+    "45205": [
+      "wspd",
+      "wdir",
+      "airtemp",
+      "wtemp",
+      "wvhgt",
+      "dompd"
+    ],
+    "45206": [
+      "wspd",
+      "wdir",
+      "airtemp",
+      "wtemp",
+      "wvhgt",
+      "dompd"
+    ],
+    "45207": [
+      "wspd",
+      "wdir",
+      "airtemp",
+      "wtemp",
+      "wvhgt",
+      "dompd"
+    ],
+    "45208": [
+      "wspd",
+      "wdir",
+      "airtemp",
+      "wtemp",
+      "wvhgt",
+      "dompd"
+    ],
+    "mwchagrin": [
+      "airtemp",
+      "dewpt",
+      "precipaccum",
+      "rh",
+      "baro",
+      "srad",
+      "wdir",
+      "wgst",
+      "wspd"
+    ]
   }
-]
+}

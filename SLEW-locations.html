@@ -245,6 +245,46 @@
       },
     ];
 
+    function normalizePopupParamConfig(raw) {
+      if (!raw) return null;
+      if (Array.isArray(raw)) {
+        const parameterDefinitions = raw.map((row, i) => ({
+          id: row.id || `param-${i}`,
+          terms: row.terms || (row.term ? [row.term] : []),
+          label: row.label,
+          format: row.format,
+          hideIfLe: row.hideIfLe,
+          decimals: row.decimals,
+        }));
+        return {
+          parameterDefinitions,
+          stationParameterOrder: {
+            default: parameterDefinitions.map((d) => d.id),
+          },
+        };
+      }
+      const defs = (raw.parameterDefinitions || []).map((row, i) => ({
+        id: row.id || `param-${i}`,
+        terms: row.terms || (row.term ? [row.term] : []),
+        label: row.label,
+        format: row.format,
+        hideIfLe: row.hideIfLe,
+        decimals: row.decimals,
+      }));
+      const order = { ...(raw.stationParameterOrder || {}) };
+      const stationKeys = Object.keys(order).filter(
+        (k) => k !== "default" && k !== "*"
+      );
+      if (!order.default && !order["*"]) {
+        if (stationKeys.length === 0) {
+          order.default = defs.map((d) => d.id);
+        } else {
+          order.default = [];
+        }
+      }
+      return { parameterDefinitions: defs, stationParameterOrder: order };
+    }
+
     async function loadPopupParameterSpec() {
       try {
         const url = new URL(
@@ -254,10 +294,12 @@
         const res = await fetch(url.toString(), { cache: "no-store" });
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data) && data.length) return data;
+          const normalized = normalizePopupParamConfig(data);
+          if (normalized && normalized.parameterDefinitions.length)
+            return normalized;
         }
       } catch (_) {}
-      return POPUP_PARAMETER_SPEC_FALLBACK;
+      return normalizePopupParamConfig(POPUP_PARAMETER_SPEC_FALLBACK);
     }
 
     function escapeHtml(s) {
@@ -266,23 +308,6 @@
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
-    }
-
-    function pickPropertyValue(props, terms) {
-      const list = Array.isArray(terms) ? terms : terms ? [terms] : [];
-      for (const term of list) {
-        if (term == null || term === "") continue;
-        if (props[term] !== undefined && props[term] !== null)
-          return props[term];
-        const k = Object.keys(props).find(
-          (x) => x.toLowerCase() === String(term).toLowerCase()
-        );
-        if (k != null) {
-          const v = props[k];
-          if (v !== undefined && v !== null) return v;
-        }
-      }
-      return undefined;
     }
 
     function formatPopupParameterValue(value, row) {
@@ -319,11 +344,12 @@
       }
     }
 
-    function buildPopupParametersHtml(props, spec) {
+    function buildPopupParametersHtml(results, specRows) {
+      const list = results || [];
       let cells = "";
-      for (const row of spec) {
+      for (const row of specRows) {
         const terms = row.terms || (row.term ? [row.term] : []);
-        const raw = pickPropertyValue(props, terms);
+        const raw = pickResultValue(list, terms);
         if (raw === undefined || raw === null || raw === "") continue;
         const formatted = formatPopupParameterValue(raw, row);
         if (formatted === null || formatted === "") continue;
@@ -381,6 +407,45 @@
       return String(station.deviceLabel || "").trim() || "Station";
     }
 
+    function stationLookupKeys(station) {
+      const keys = [];
+      const seen = new Set();
+      const add = (v) => {
+        const s = String(v || "").trim();
+        if (s && !seen.has(s)) {
+          seen.add(s);
+          keys.push(s);
+        }
+      };
+      add(station.deviceLabel);
+      add(station.name);
+      add(station.deviceId);
+      add(station.description);
+      add(getStationDisplayName(station));
+      return keys;
+    }
+
+    function resolveDefinitionRowsForStation(station, config) {
+      if (!config || !config.parameterDefinitions?.length) return [];
+      const defById = new Map(
+        config.parameterDefinitions.map((d) => [d.id, d])
+      );
+      const orderMap = config.stationParameterOrder || {};
+      let ids = null;
+      for (const key of stationLookupKeys(station)) {
+        const row = orderMap[key];
+        if (Array.isArray(row) && row.length) {
+          ids = row;
+          break;
+        }
+      }
+      if (!ids || !ids.length) {
+        ids = orderMap.default || orderMap["*"];
+      }
+      if (!ids || !ids.length) return [];
+      return ids.map((id) => defById.get(id)).filter(Boolean);
+    }
+
     /** Land / lab devices with no lat/lon in Ubidots results (approximate map pins). */
     const STATION_COORD_FALLBACK = {
       "GLSC Stormwater 11": [-81.6955, 41.5075],
@@ -393,6 +458,25 @@
       if (v == null) return undefined;
       if (v.datavalue !== undefined && v.datavalue !== null) return v.datavalue;
       if (v.value !== undefined && v.value !== null) return v.value;
+      return undefined;
+    }
+
+    function pickResultValue(results, terms) {
+      if (!results || !results.length) return undefined;
+      const list = Array.isArray(terms) ? terms : terms ? [terms] : [];
+      for (const term of list) {
+        if (term == null || term === "") continue;
+        const want = String(term).toLowerCase();
+        const r = results.find((x) => {
+          const vt = String(x.variableTerm || "").toLowerCase();
+          const vv = String(x.variable || "").toLowerCase();
+          return vt === want || vv === want;
+        });
+        if (r) {
+          const val = getResultValue(r);
+          if (val !== undefined && val !== null) return val;
+        }
+      }
       return undefined;
     }
 
@@ -525,7 +609,7 @@
       async function getLocation() {
         // Make a GET request to the API and return the details of the buoys
         try {
-          const [popupParamSpec, response] = await Promise.all([
+          const [popupParamConfig, response] = await Promise.all([
             loadPopupParameterSpec(),
             fetch(
               //"http://localhost:3000/api/clewa",
@@ -566,17 +650,11 @@
                 coordinates: [longitude, latitude],
               },
             };
-            (station.results || []).forEach((result) => {
-              const term = result.variableTerm || result.variable;
-              if (term) {
-                stationFeatures.properties[term] = getResultValue(result);
-              }
-            });
             const p = stationFeatures.properties;
             p.stationDescription = String(station.description || "").trim();
-            console.log(
-              `STATIONFeatureProperties FOR ${p.name}=> `,
-              stationFeatures.properties
+            const popupRows = resolveDefinitionRowsForStation(
+              station,
+              popupParamConfig
             );
             stationFeatures.html = imageURL
               ? `<div style="height: 200px; width:100%; background-size: cover; background-position: center center;background-image: url(${imageURL})"></div>`
@@ -588,9 +666,11 @@
             ) {
               stationFeatures.html += `<p style="margin: -6px 0 10px; font-size: 11px; line-height: 1.35; color: rgba(255,255,255,0.7);">${p.stationDescription}</p>`;
             }
-            console.log(stationFeatures.properties);
             stationFeatures.html += `<p title="${p.lastUpdated.localUpdateTime}">Last Updated: ${p.lastUpdated.message}</p>`;
-            stationFeatures.html += buildPopupParametersHtml(p, popupParamSpec);
+            stationFeatures.html += buildPopupParametersHtml(
+              station.results || [],
+              popupRows
+            );
 
             featuresArray.push(stationFeatures);
           });
