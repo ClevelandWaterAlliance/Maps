@@ -1,0 +1,349 @@
+[
+  {
+    "terms": [
+      "Water temperature",
+      "Water temperature (0 m)",
+      "wtemp",
+      "wTemp",
+      "Wtemp 1",
+      "Wtemp 1.5",
+      "Wtemp 1m",
+      "Wtemp 2",
+      "Wtemp 2m",
+      "Wtemp 3",
+      "Wtemp 4",
+      "Wtemp 4.5",
+      "Wtemp 4.6",
+      "Wtemp 4m",
+      "Wtemp 5",
+      "Wtemp 6",
+      "Wtemp 6m",
+      "Wtemp 7.5",
+      "Wtemp 7.6",
+      "Wtemp 8",
+      "Wtemp 8m",
+      "Wtemp 9",
+      "Wtemp 9.1",
+      "Wtemp 10.5",
+      "Wtemp 10.7",
+      "Wtemp 10m",
+      "Wtemp 11.3",
+      "Wtemp 11.8",
+      "Wtemp 12",
+      "Wtemp 12.5",
+      "Wtemp 12m",
+      "Wtemp 13.1",
+      "Wtemp 13.5",
+      "Wtemp 13.7",
+      "Wtemp 13.8",
+      "Wtemp 14.3",
+      "Wtemp 14.9",
+      "Wtemp 14m",
+      "Wtemp 15",
+      "Wtemp 15.3",
+      "Wtemp 16m",
+      "Wtemp 18m",
+      "Wtemp 20m",
+      "Wtemp 21m"
+    ],
+    "label": "Water temperature",
+    "format": "celsiusF",
+    "hideIfLe": -99
+  },
+  {
+    "terms": ["Water Temperature (F) - Sensor #1"],
+    "label": "Water temperature (sensor °F)",
+    "format": "fahrenheit",
+    "hideIfLe": -99,
+    "decimals": 1
+  },
+  {
+    "terms": ["Air temperature", "airtemp"],
+    "label": "Air temperature",
+    "format": "celsiusF",
+    "hideIfLe": -99
+  },
+  {
+    "terms": ["Dew point"],
+    "label": "Dew point",
+    "format": "celsiusF",
+    "hideIfLe": -99
+  },
+  {
+    "terms": ["Relative humidity", "rh"],
+    "label": "Relative humidity",
+    "format": "percent",
+    "hideIfLe": -99,
+    "decimals": 1
+  },
+  {
+    "terms": ["Encrh"],
+    "label": "Enclosure RH",
+    "format": "percent",
+    "hideIfLe": -99,
+    "decimals": 1
+  },
+  {
+    "terms": ["Barometric pressure"],
+    "label": "Barometric pressure",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Wind speed", "wspd"],
+    "label": "Wind speed",
+    "format": "knotsFromMps",
+    "hideIfLe": -99
+  },
+  {
+    "terms": ["Wind gust"],
+    "label": "Wind gust",
+    "format": "knotsFromMps",
+    "hideIfLe": -99
+  },
+  {
+    "terms": ["Wind direction"],
+    "label": "Wind direction",
+    "format": "degrees",
+    "hideIfLe": -99
+  },
+  {
+    "terms": ["Wave height", "wvhgt"],
+    "label": "Wave height",
+    "format": "meters",
+    "decimals": 2
+  },
+  {
+    "terms": ["Dominant period"],
+    "label": "Dominant wave period",
+    "format": "seconds",
+    "decimals": 0
+  },
+  {
+    "terms": ["Water level"],
+    "label": "Water level",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Water Level (ft) at IGLD85 - Sensor #1"],
+    "label": "Water level (ft, IGLD85)",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Distance to Water (ft) - Sensor #1"],
+    "label": "Distance to water (ft)",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Depth"],
+    "label": "Depth",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Solar radiation", "srad"],
+    "label": "Solar radiation",
+    "format": "integer"
+  },
+  {
+    "terms": ["Par"],
+    "label": "PAR",
+    "format": "number",
+    "decimals": 1
+  },
+  {
+    "terms": ["Ph 6"],
+    "label": "pH (6 m)",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Ph 8"],
+    "label": "pH (8 m)",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Ph 13.8"],
+    "label": "pH (13.8 m)",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Ph 15"],
+    "label": "pH (15 m)",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Ph 21m"],
+    "label": "pH (21 m)",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Do 6"],
+    "label": "Dissolved oxygen (6 m)",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Do 8"],
+    "label": "Dissolved oxygen (8 m)",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Do 15"],
+    "label": "Dissolved oxygen (15 m)",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Do 21m"],
+    "label": "Dissolved oxygen (21 m)",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Dosat 6"],
+    "label": "DO saturation (6 m)",
+    "format": "percent",
+    "decimals": 1
+  },
+  {
+    "terms": ["Dosat 8"],
+    "label": "DO saturation (8 m)",
+    "format": "percent",
+    "decimals": 1
+  },
+  {
+    "terms": ["Turb 6"],
+    "label": "Turbidity (6 m)",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Turb 8"],
+    "label": "Turbidity (8 m)",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Spcond 6"],
+    "label": "Specific conductance (6 m)",
+    "format": "number",
+    "decimals": 1
+  },
+  {
+    "terms": ["Spcond 8"],
+    "label": "Specific conductance (8 m)",
+    "format": "number",
+    "decimals": 1
+  },
+  {
+    "terms": ["Sal"],
+    "label": "Salinity",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Orp 6"],
+    "label": "ORP (6 m)",
+    "format": "number",
+    "decimals": 1
+  },
+  {
+    "terms": ["Orp 8"],
+    "label": "ORP (8 m)",
+    "format": "number",
+    "decimals": 1
+  },
+  {
+    "terms": ["Fdomrfu"],
+    "label": "fDOM (RFU)",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Chlrfu 13.8"],
+    "label": "Chlorophyll (RFU, 13.8 m)",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Chlrfu 15"],
+    "label": "Chlorophyll (RFU, 15 m)",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Bgacells"],
+    "label": "BGA cells",
+    "format": "number",
+    "decimals": 0
+  },
+  {
+    "terms": ["Soilvwc 0.075m"],
+    "label": "Soil VWC (0.075 m)",
+    "format": "number",
+    "decimals": 1
+  },
+  {
+    "terms": ["Soilvwc 0.225m"],
+    "label": "Soil VWC (0.225 m)",
+    "format": "number",
+    "decimals": 1
+  },
+  {
+    "terms": ["Soilvwc 0.375m"],
+    "label": "Soil VWC (0.375 m)",
+    "format": "number",
+    "decimals": 1
+  },
+  {
+    "terms": ["Soiltemp 0.035m"],
+    "label": "Soil temp (0.035 m)",
+    "format": "celsiusF",
+    "hideIfLe": -99
+  },
+  {
+    "terms": ["Soiltemp 0.1m"],
+    "label": "Soil temp (0.1 m)",
+    "format": "celsiusF",
+    "hideIfLe": -99
+  },
+  {
+    "terms": ["Soiltemp 0.2m"],
+    "label": "Soil temp (0.2 m)",
+    "format": "celsiusF",
+    "hideIfLe": -99
+  },
+  {
+    "terms": ["Precipitation accumulation"],
+    "label": "Precipitation accumulation",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Precipint"],
+    "label": "Precipitation intensity",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Vbat"],
+    "label": "Battery (V)",
+    "format": "number",
+    "decimals": 2
+  },
+  {
+    "terms": ["Enctemp"],
+    "label": "Enclosure temperature",
+    "format": "celsiusF",
+    "hideIfLe": -99
+  }
+]

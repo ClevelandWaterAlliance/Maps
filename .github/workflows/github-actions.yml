@@ -1,0 +1,11 @@
+name: Scheduled Request
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+jobs:
+  request_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send GET request to endpoint
+        run: |
+          curl -X GET https://serverless-neon-mu.vercel.app/api/data

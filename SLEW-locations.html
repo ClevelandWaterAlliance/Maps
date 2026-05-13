@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CLEWA Smart Buoy Map</title>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --marker-size: 50px;
+        --stale: rgb(255, 0, 0);
+        --old: rgb(255, 165, 0);
+        --recent: rgb(85, 107, 47);
+        --fresh: rgb(0, 128, 0);
+      }
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+      .marker {
+        display: block;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        padding: 0;
+        top: 0;
+        position: absolute;
+        width: var(--marker-size) !important;
+        height: var(--marker-size) !important;
+      }
+      .mapboxgl-popup {
+        width: 400px;
+        font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+        position: absolute;
+        top: 0;
+        color: white;
+      }
+
+      .mapboxgl-popup a {
+        color: cadetblue;
+      }
+      .mapboxgl-popup-content {
+        background: rgba(0, 0, 0, 0.75);
+      }
+      .mapboxgl-popup-tip {
+        border-top-color: rgba(0, 0, 0, 0.75) !important;
+      }
+
+      .clewa-popup-params {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 14px;
+        row-gap: 8px;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .clewa-popup-param {
+        min-width: 0;
+        font-size: 11px;
+        line-height: 1.35;
+      }
+
+      .clewa-popup-param-label {
+        display: block;
+        opacity: 0.82;
+        margin-bottom: 1px;
+        word-wrap: break-word;
+      }
+
+      .clewa-popup-param-value {
+        display: block;
+        font-weight: 600;
+        font-size: 12px;
+        word-wrap: break-word;
+      }
+
+      .mapboxgl-marker {
+        border-width: 3px;
+        border-style: solid;
+      }
+
+      .fresh {
+        border-color: var(--fresh);
+      }
+      .recent {
+        border-color: var(--recent);
+      }
+      .old {
+        border-color: var(--old);
+      }
+      .stale {
+        border-color: var(--stale);
+      }
+
+      .filterWrapper {
+        position: relative;
+        z-index: 2;
+        margin: 10px 0 0 10px;
+      }
+      .filterBtn {
+        width: 30px;
+        height: 30px;
+        margin-bottom: 10px;
+        border-radius: 50%;
+      }
+
+      .staleFilter {
+        background-color: var(--stale);
+        border-color: var(--stale);
+      }
+      .oldFilter {
+        background-color: var(--old);
+        border-color: var(--old);
+      }
+      .recentFilter {
+        background-color: var(--recent);
+      }
+      .freshFilter {
+        background-color: var(--fresh);
+      }
+
+      .buoyFilter {
+        background-color: white;
+        background-image: url("https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/66565654cc482c56bcbd26f3_BUOY-01.svg");
+        background-size: contain;
+      }
+
+      .platformFilter {
+        background-color: white;
+        background-image: url("https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/66565650008621dd7680980c_BUOY-02.svg");
+        background-size: contain;
+      }
+
+      .inactive {
+        opacity: 0.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="filterWrapper">
+      <div class="flexcol">
+        <div
+          class="filterBtn staleFilter"
+          onClick="toggleData(this, 'stale')"
+        ></div>
+        <div
+          class="filterBtn oldFilter"
+          onClick="toggleData(this, 'old')"
+        ></div>
+        <div
+          class="filterBtn recentFilter"
+          onClick="toggleData(this, 'recent')"
+        ></div>
+        <div
+          class="filterBtn freshFilter"
+          onClick="toggleData(this, 'fresh')"
+        ></div>
+      </div>
+      <div class="flexrow">
+        <div
+          class="filterBtn buoyFilter"
+          onClick="toggleData(this, 'Buoy')"
+        ></div>
+        <div
+          class="filterBtn platformFilter"
+          onClick="toggleData(this, 'Platform')"
+        ></div>
+      </div>
+    </div>
+    <div id="map"></div>
+  </body>
+  <script src="mapbox-config.js"></script>
+  <script>
+    const toggleData = (el, cat) => {
+      $(`.${cat}`).toggle();
+      console.log(el);
+      $(el).toggleClass("inactive");
+    };
+
+    // UTIL
+    function celsiusToFahrenheit(celsius) {
+      // Check if the input is a valid number
+      if (typeof celsius !== "number") {
+        return "Input is not a valid number";
+      }
+      // Perform the conversion
+      const fahrenheit = (celsius * 9) / 5 + 32;
+      return fahrenheit.toFixed(1);
+    }
+
+    function metersPerSecondToKnots(mps) {
+      const knots = mps * 1.94384;
+      return knots.toFixed(2);
+    }
+
+    /** Popover rows: keep in sync with `SLEW-popup-parameters.xlsx` (export columns → this JSON). */
+    const POPUP_PARAMETER_SPEC_FALLBACK = [
+      {
+        terms: ["Water temperature", "wtemp", "wTemp"],
+        label: "Water temperature",
+        format: "celsiusF",
+        hideIfLe: -99,
+      },
+      {
+        terms: ["Air temperature", "airtemp"],
+        label: "Air temperature",
+        format: "celsiusF",
+        hideIfLe: -99,
+      },
+      {
+        terms: ["Relative humidity", "rh"],
+        label: "Relative humidity",
+        format: "percent",
+        hideIfLe: -99,
+        decimals: 1,
+      },
+      {
+        terms: ["Wind speed", "wspd"],
+        label: "Wind speed",
+        format: "knotsFromMps",
+        hideIfLe: -99,
+      },
+      {
+        terms: ["Wave height", "wvhgt"],
+        label: "Wave height",
+        format: "meters",
+        decimals: 2,
+      },
+    ];
+
+    async function loadPopupParameterSpec() {
+      try {
+        const url = new URL(
+          "SLEW-popup-parameters.json",
+          window.location.href
+        );
+        const res = await fetch(url.toString(), { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length) return data;
+        }
+      } catch (_) {}
+      return POPUP_PARAMETER_SPEC_FALLBACK;
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function pickPropertyValue(props, terms) {
+      const list = Array.isArray(terms) ? terms : terms ? [terms] : [];
+      for (const term of list) {
+        if (term == null || term === "") continue;
+        if (props[term] !== undefined && props[term] !== null)
+          return props[term];
+        const k = Object.keys(props).find(
+          (x) => x.toLowerCase() === String(term).toLowerCase()
+        );
+        if (k != null) {
+          const v = props[k];
+          if (v !== undefined && v !== null) return v;
+        }
+      }
+      return undefined;
+    }
+
+    function formatPopupParameterValue(value, row) {
+      const fmt = row.format || "number";
+      if (fmt === "text") return escapeHtml(value);
+      if (typeof value !== "number" || Number.isNaN(value)) {
+        return escapeHtml(String(value));
+      }
+      const hide = row.hideIfLe;
+      if (hide !== undefined && value <= hide) return null;
+      const dec =
+        row.decimals !== undefined && row.decimals !== null
+          ? row.decimals
+          : 2;
+      switch (fmt) {
+        case "celsiusF":
+          return `${celsiusToFahrenheit(value)}°F`;
+        case "fahrenheit":
+          return `${value.toFixed(dec)}°F`;
+        case "percent":
+          return `${value.toFixed(dec)}%`;
+        case "meters":
+          return `${value.toFixed(dec)} m`;
+        case "knotsFromMps":
+          return `${Math.round(Number(metersPerSecondToKnots(value)))} knots`;
+        case "integer":
+          return String(Math.round(value));
+        case "degrees":
+          return `${Math.round(value)}°`;
+        case "seconds":
+          return `${value.toFixed(dec)} s`;
+        default:
+          return value.toFixed(dec);
+      }
+    }
+
+    function buildPopupParametersHtml(props, spec) {
+      let cells = "";
+      for (const row of spec) {
+        const terms = row.terms || (row.term ? [row.term] : []);
+        const raw = pickPropertyValue(props, terms);
+        if (raw === undefined || raw === null || raw === "") continue;
+        const formatted = formatPopupParameterValue(raw, row);
+        if (formatted === null || formatted === "") continue;
+        const label = escapeHtml(row.label || terms[0] || "");
+        cells += `<div class="clewa-popup-param"><span class="clewa-popup-param-label">${label}</span><span class="clewa-popup-param-value">${formatted}</span></div>`;
+      }
+      if (!cells) return "";
+      return `<div class="clewa-popup-params">${cells}</div>`;
+    }
+
+    /** NDBC fixed positions (GeoJSON order: lon, lat) — API no longer embeds these on mooring payloads. */
+    const NDBC_STATION_COORDS = {
+      45164: [-81.698, 41.748],
+      45176: [-81.765, 41.55],
+      45196: [-81.88, 41.521],
+      45197: [-81.617, 41.619],
+      45200: [-83.37, 41.724],
+      45201: [-82.781, 41.601],
+      45202: [-82.941, 41.532],
+      45203: [-82.512, 41.393],
+      45204: [-82.115, 41.508],
+      45205: [-81.748, 41.501],
+      45206: [-81.583, 41.585],
+      45207: [-81.367, 41.731],
+      45208: [-80.807, 41.913],
+    };
+
+    /** When API `description` is empty, use NDBC page titles for popover labels. */
+    const NDBC_STATION_DISPLAY_NAMES = {
+      45164: "Cleveland Buoy, OH",
+      45196: "Rocky River, OH",
+      45197: "Euclid, OH",
+    };
+
+    function isNdbcStyleStationId(s) {
+      return /^\d{5}$/.test(String(s || "").trim());
+    }
+
+    function getStationDisplayName(station) {
+      const name = String(station.name || "").trim();
+      const sampling = String(station.samplingfeaturename || "").trim();
+      const description = String(station.description || "").trim();
+
+      if (isNdbcStyleStationId(name) || isNdbcStyleStationId(sampling)) {
+        if (description) return description;
+        const idNum = Number(name || sampling);
+        const fallback = NDBC_STATION_DISPLAY_NAMES[idNum];
+        if (fallback) return fallback;
+        return sampling || name;
+      }
+
+      if (sampling) return sampling;
+      if (name) return name;
+      if (description) return description;
+      return String(station.deviceLabel || "").trim() || "Station";
+    }
+
+    /** Land / lab devices with no lat/lon in Ubidots results (approximate map pins). */
+    const STATION_COORD_FALLBACK = {
+      "GLSC Stormwater 11": [-81.6955, 41.5075],
+      mcglsc: [-81.6958, 41.5088],
+      mwchagrin: [-81.52, 41.55],
+    };
+
+    function getResultValue(result) {
+      const v = result?.values;
+      if (v == null) return undefined;
+      if (v.datavalue !== undefined && v.datavalue !== null) return v.datavalue;
+      if (v.value !== undefined && v.value !== null) return v.value;
+      return undefined;
+    }
+
+    function resultByTerm(station, term) {
+      const t = String(term).toLowerCase();
+      const r = station.results?.find(
+        (x) => String(x.variableTerm || x.variable || "").toLowerCase() === t
+      );
+      return r ? getResultValue(r) : undefined;
+    }
+
+    function resolveStationCoordinates(station) {
+      const lon0 = station.longitude;
+      const lat0 = station.latitude;
+      if (typeof lon0 === "number" && typeof lat0 === "number") {
+        return [lon0, lat0];
+      }
+      const lat = resultByTerm(station, "lat");
+      const lon = resultByTerm(station, "lon");
+      if (typeof lat === "number" && typeof lon === "number") {
+        return [lon, lat];
+      }
+      const idKey = station.deviceLabel || station.name;
+      if (idKey && NDBC_STATION_COORDS[String(idKey)]) {
+        return NDBC_STATION_COORDS[String(idKey)];
+      }
+      if (station.name && STATION_COORD_FALLBACK[station.name]) {
+        return STATION_COORD_FALLBACK[station.name];
+      }
+      return null;
+    }
+
+    function inferStationType(station) {
+      const ext = station.extensionproperties?.stationType;
+      if (ext) return ext;
+      const id = String(station.deviceLabel || station.name || "");
+      return /^\d{5}$/.test(id) ? "Buoy" : "Platform";
+    }
+
+    function formatRelativeDate(dateStr) {
+      const date = new Date(dateStr);
+
+      // Get the current date and time in Greenwich Mean Time (GMT)
+      var currentDate = new Date();
+      var gmtTimeString = currentDate.toLocaleString("en-US", {
+        timeZone: "UTC",
+      });
+
+      let localUpdateTime = date.toLocaleString("en-US", {
+        timeZone: "America/New_York",
+      });
+
+      // Convert the formatted string back to a Date object
+      var gmtTimeDateObject = new Date(gmtTimeString);
+
+      const delta = gmtTimeDateObject - date;
+
+      const seconds = Math.floor(delta / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+      const weeks = Math.floor(days / 7);
+      const months = Math.floor(days / 30);
+      const years = Math.floor(days / 365);
+      let dataStatus = {
+        message: "Unknown",
+        status: "",
+        localUpdateTime,
+      };
+
+      if (delta < 1000) {
+        dataStatus.message = "Just now";
+        dataStatus.status = "fresh";
+        return dataStatus;
+      } else if (delta < 60000) {
+        dataStatus.message = `${seconds} second${seconds > 1 ? "s" : ""} ago`;
+        dataStatus.status = "fresh";
+      } else if (delta < 3600000) {
+        dataStatus.message = `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+        dataStatus.status = "fresh";
+      } else if (delta < 86400000) {
+        dataStatus.message = `${hours} hour${hours > 1 ? "s" : ""} ago`;
+        dataStatus.status = "recent";
+      } else if (delta < 604800000) {
+        dataStatus.message = `${days} days ago`;
+        dataStatus.status = "recent";
+      } else if (delta < 2592000000) {
+        dataStatus.message = `${weeks} week${weeks > 1 ? "s" : ""} ago`;
+        dataStatus.status = "old";
+        // } else if (delta < 31536000000) {
+        //   return `${months} months ago`;
+      } else {
+        //return `over ${years} year(s) ago`;
+        dataStatus.message = `Over a month ago`;
+        dataStatus.status = "stale";
+      }
+      return dataStatus;
+    }
+    mapboxgl.accessToken = window.MAPBOX_ACCESS_TOKEN || "";
+    if (!mapboxgl.accessToken) {
+      document.getElementById("map").innerHTML =
+        '<div style="padding:24px;max-width:420px;line-height:1.5;color:#eee;background:#1a1a1a;font-family:system-ui,sans-serif;font-size:14px;">Mapbox token missing. Copy <code style="color:#7fdbca">mapbox-config.example.js</code> to <code style="color:#7fdbca">mapbox-config.js</code> in this folder, set <code style="color:#7fdbca">window.MAPBOX_ACCESS_TOKEN</code> to your public token, then reload.</div>';
+    } else {
+      const map = new mapboxgl.Map({
+        container: "map",
+        // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+        style: "mapbox://styles/mapbox/streets-v12",
+        zoom: 8.5,
+        center: [-81.800004, 41.8411],
+      });
+
+      map.on("load", async () => {
+      // Get the initial location of the International Space Station (ISS).
+      const geojson = await getLocation();
+
+      map.addSource("clewa", {
+        type: "geojson",
+        data: geojson,
+      });
+
+      map.addLayer({
+        id: "clewa",
+        type: "circle",
+        source: "clewa",
+      });
+
+      // Update the source from the API every 10 seconds.
+      map.getSource("clewa").setData(geojson);
+
+      async function getLocation() {
+        // Make a GET request to the API and return the details of the buoys
+        try {
+          const [popupParamSpec, response] = await Promise.all([
+            loadPopupParameterSpec(),
+            fetch(
+              //"http://localhost:3000/api/clewa",
+              "https://serverless-neon-mu.vercel.app/api/clewa",
+              { method: "GET" }
+            ),
+          ]);
+          const { stations } = await response.json();
+          const featuresArray = [];
+          stations.forEach((station) => {
+            const coords = resolveStationCoordinates(station);
+            if (!coords) {
+              console.warn("Skipping station (no coordinates):", station.name);
+              return;
+            }
+            const [longitude, latitude] = coords;
+            const imageURL =
+              station.auxData?.img_tall ||
+              station.imageURL ||
+              station.imageUrl ||
+              "";
+            const stationFeatures = {
+              type: "Feature",
+              properties: {
+                name: getStationDisplayName(station),
+                type: inferStationType(station),
+                imageURL,
+                iconSize: ["interpolate", ["linear"], ["zoom"], 10, 1, 15, 0.5],
+                stationPage:
+                  station.stationPage ||
+                  station.stationUrl ||
+                  station.url ||
+                  null,
+                lastUpdated: formatRelativeDate(station.lastUpdated),
+              },
+              geometry: {
+                type: "Point",
+                coordinates: [longitude, latitude],
+              },
+            };
+            (station.results || []).forEach((result) => {
+              const term = result.variableTerm || result.variable;
+              if (term) {
+                stationFeatures.properties[term] = getResultValue(result);
+              }
+            });
+            const p = stationFeatures.properties;
+            p.stationDescription = String(station.description || "").trim();
+            console.log(
+              `STATIONFeatureProperties FOR ${p.name}=> `,
+              stationFeatures.properties
+            );
+            stationFeatures.html = imageURL
+              ? `<div style="height: 200px; width:100%; background-size: cover; background-position: center center;background-image: url(${imageURL})"></div>`
+              : "";
+            stationFeatures.html += `<h2>${p.name}</h2>`;
+            if (
+              p.stationDescription &&
+              p.stationDescription !== p.name
+            ) {
+              stationFeatures.html += `<p style="margin: -6px 0 10px; font-size: 11px; line-height: 1.35; color: rgba(255,255,255,0.7);">${p.stationDescription}</p>`;
+            }
+            console.log(stationFeatures.properties);
+            stationFeatures.html += `<p title="${p.lastUpdated.localUpdateTime}">Last Updated: ${p.lastUpdated.message}</p>`;
+            stationFeatures.html += buildPopupParametersHtml(p, popupParamSpec);
+
+            featuresArray.push(stationFeatures);
+          });
+
+          return {
+            type: "FeatureCollection",
+            features: featuresArray,
+          };
+        } catch (err) {
+          // If the updateSource interval is defined, clear the interval to stop updating the source.
+
+          throw new Error(err);
+        }
+      }
+      // Add markers to the map.
+      async function addMarkers() {
+        for (const marker of geojson.features) {
+          // Create a DOM element for each marker.
+          const el = document.createElement("div");
+          const width = marker.properties.iconSize[0];
+          const height = marker.properties.iconSize[1];
+          el.className = "marker";
+          el.style.backgroundColor = "rgba(255,255,255,.75)";
+          el.style.backgroundImage = `${
+            marker.properties.type === "Buoy"
+              ? "url(https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/66565654cc482c56bcbd26f3_BUOY-01.svg)"
+              : "url(https://uploads-ssl.webflow.com/637657aad5c230a847bf7380/66565650008621dd7680980c_BUOY-02.svg)"
+          }`;
+          el.classList.add(marker.properties.lastUpdated.status);
+          el.classList.add(marker.properties.type);
+          el.style.width = `${width}px`;
+          el.style.height = `${height}px`;
+          el.style.backgroundSize = "100%";
+          // el.addEventListener("click", () => {
+          //   showPopup;
+          // });
+          // Add markers to the map.
+          new mapboxgl.Marker(el)
+            .setLngLat(marker.geometry.coordinates)
+            .setPopup(
+              new mapboxgl.Popup({ offset: [0, -20] }).setHTML(marker.html)
+            ) // add popup
+            .addTo(map);
+        }
+      }
+      addMarkers();
+
+      map.on("render", function () {
+        const scale = Math.pow(2, map.getZoom());
+        console.log(scale);
+        let root = document.documentElement;
+        root.style.setProperty(
+          "--marker-size",
+          `clamp(30px, ${scale / 10}px, 5vw)`
+        );
+      });
+
+      map.on("click", (event) => {
+        const features = map.queryRenderedFeatures(event.point, {
+          layers: ["clewa"],
+        });
+        if (!features.length) {
+          return;
+        }
+        const feature = features[0];
+      });
+    });
+    }
+  </script>
+</html>

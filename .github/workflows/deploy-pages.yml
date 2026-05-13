@@ -1,0 +1,60 @@
+# Builds the static site for GitHub Pages and writes mapbox-config.js from a repo secret
+# so the Mapbox default public token is never committed to git (avoids push protection).
+#
+# Setup (once):
+# 1. Repo → Settings → Secrets and variables → Actions → New repository secret
+#    Name: MAPBOX_ACCESS_TOKEN   Value: your pk.* token from https://account.mapbox.com/access-tokens/
+# 2. Repo → Settings → Pages → Build and deployment → Source: GitHub Actions
+#
+# Optional: restrict the token in Mapbox to https://clevelandwateralliance.github.io/*
+
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write Mapbox token for static maps
+        run: |
+          node <<'NODE'
+          const fs = require("fs");
+          const t = process.env.MAPBOX_ACCESS_TOKEN || "";
+          if (!t) {
+            console.error("Missing MAPBOX_ACCESS_TOKEN secret; add it under Repo → Settings → Secrets → Actions.");
+            process.exit(1);
+          }
+          fs.writeFileSync(
+            "mapbox-config.js",
+            "window.MAPBOX_ACCESS_TOKEN = " + JSON.stringify(t) + ";\n"
+          );
+          NODE
+        env:
+          MAPBOX_ACCESS_TOKEN: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
