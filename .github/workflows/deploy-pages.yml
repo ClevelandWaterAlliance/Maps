@@ -7,6 +7,12 @@
 # 2. Repo → Settings → Pages → Build and deployment → Source: GitHub Actions
 #
 # Optional: restrict the token in Mapbox to https://clevelandwateralliance.github.io/*
+#
+# If the job fails with an empty token but you added a secret:
+# - Use Settings → Secrets and variables → Actions (not Dependabot).
+# - If the job waits forever, check Environments → github-pages → required reviewers.
+# - If your org only exposes secrets to environments, add MAPBOX_ACCESS_TOKEN under
+#   Settings → Environments → github-pages → Environment secrets (same name).
 
 name: Deploy GitHub Pages
 
@@ -34,25 +40,17 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Write Mapbox token for static maps
-        run: |
-          node <<'NODE'
-          const fs = require("fs");
-          const t = process.env.MAPBOX_ACCESS_TOKEN || "";
-          if (!t) {
-            console.error("Missing MAPBOX_ACCESS_TOKEN secret; add it under Repo → Settings → Secrets → Actions.");
-            process.exit(1);
-          }
-          fs.writeFileSync(
-            "mapbox-config.js",
-            "window.MAPBOX_ACCESS_TOKEN = " + JSON.stringify(t) + ";\n"
-          );
-          NODE
         env:
           MAPBOX_ACCESS_TOKEN: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
+        run: >-
+          node -e "const fs=require('fs');const t=process.env.MAPBOX_ACCESS_TOKEN||'';if(!t){console.error('Missing MAPBOX_ACCESS_TOKEN');process.exit(1)};fs.writeFileSync('mapbox-config.js','window.MAPBOX_ACCESS_TOKEN = '+JSON.stringify(t)+';'+String.fromCharCode(10));"
+
+      - name: Verify mapbox-config.js (size only, not contents)
+        run: test -f mapbox-config.js && test "$(wc -c < mapbox-config.js)" -gt 40 && echo "mapbox-config.js present"
 
       - uses: actions/configure-pages@v5
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: .
 
