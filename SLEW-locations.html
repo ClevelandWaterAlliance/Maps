@@ -446,12 +446,52 @@
       return ids.map((id) => defById.get(id)).filter(Boolean);
     }
 
-    /** Land / lab devices with no lat/lon in Ubidots results (approximate map pins). */
+    function toFiniteCoord(v) {
+      if (typeof v === "number" && Number.isFinite(v)) return v;
+      if (typeof v === "string" && v.trim() !== "") {
+        const n = Number(v);
+        return Number.isFinite(n) ? n : null;
+      }
+      return null;
+    }
+
+    /** Land / lab devices with no lat/lon in Ubidots results (approximate map pins).
+     * Keys match `station.name` and/or `station.deviceLabel` from the clewa API (see GLSC_CwaData.xlsx). */
     const STATION_COORD_FALLBACK = {
-      "GLSC Stormwater 11": [-81.6955, 41.5075],
-      mcglsc: [-81.6958, 41.5088],
-      mwchagrin: [-81.52, 41.55],
+      // GLSC soil — API renames device; label unchanged
+      "GLSC Stormwater 11": [-81.697775, 41.508146],
+      "1006-26 Stormwater 11": [-81.697775, 41.508146],
+      "864622040818805": [-81.697775, 41.508146],
+      // GLSC water level — API name vs XLSX device name
+      mcglsc: [-81.697783, 41.508791],
+      mcond3kit7: [-81.697783, 41.508791],
+      "Great Lakes Science Center Marine Conditions": [-81.697783, 41.508791],
+      // Wx / FCWA — match deviceLabel numeric IDs from XLSX Locations
+      mwchagrin: [-81.4374508, 41.6770002],
+      Mwchargrin: [-81.4374508, 41.6770002],
+      "FCWA-0002  CWA Chagrin": [-81.4374508, 41.6770002],
+      "359746163562080": [-81.4374508, 41.6770002],
+      Mwewp: [-81.736981, 41.4927904],
+      "1008-05 Weather Station": [-81.736981, 41.4927904],
+      "359746163529402": [-81.736981, 41.4927904],
+      Mwavon: [-82.045631, 41.5057544],
+      "1008-02": [-82.045631, 41.5057544],
+      "351516174975466": [-82.045631, 41.5057544],
     };
+
+    function coordsFromFallback(station) {
+      const tryKey = (k) => {
+        if (k == null || k === "") return null;
+        const s = String(k).trim();
+        return STATION_COORD_FALLBACK[s] || null;
+      };
+      return (
+        tryKey(station.name) ||
+        tryKey(station.deviceLabel) ||
+        tryKey(station.deviceId) ||
+        null
+      );
+    }
 
     function getResultValue(result) {
       const v = result?.values;
@@ -489,23 +529,22 @@
     }
 
     function resolveStationCoordinates(station) {
-      const lon0 = station.longitude;
-      const lat0 = station.latitude;
-      if (typeof lon0 === "number" && typeof lat0 === "number") {
+      const lon0 = toFiniteCoord(station.longitude);
+      const lat0 = toFiniteCoord(station.latitude);
+      if (lon0 != null && lat0 != null) {
         return [lon0, lat0];
       }
-      const lat = resultByTerm(station, "lat");
-      const lon = resultByTerm(station, "lon");
-      if (typeof lat === "number" && typeof lon === "number") {
+      const lat = toFiniteCoord(resultByTerm(station, "lat"));
+      const lon = toFiniteCoord(resultByTerm(station, "lon"));
+      if (lat != null && lon != null) {
         return [lon, lat];
       }
       const idKey = station.deviceLabel || station.name;
       if (idKey && NDBC_STATION_COORDS[String(idKey)]) {
         return NDBC_STATION_COORDS[String(idKey)];
       }
-      if (station.name && STATION_COORD_FALLBACK[station.name]) {
-        return STATION_COORD_FALLBACK[station.name];
-      }
+      const fb = coordsFromFallback(station);
+      if (fb) return fb;
       return null;
     }
 
